@@ -17,6 +17,7 @@ class HTML extends React.Component {
     htmlStyles: React.PropTypes.object,
     containerStyle: View.propTypes.style,
     onLinkPress: React.PropTypes.func,
+    imagesMaxWidth: React.PropTypes.number,
     renderers: React.PropTypes.object.isRequired
   }
 
@@ -84,6 +85,7 @@ class HTML extends React.Component {
             <HTMLElement
               key={index}
               htmlStyles={this.props.htmlStyles}
+              imagesMaxWidth={this.props.imagesMaxWidth}
               htmlAttribs={node.attribs}
               tagName={node.name}
               groupInfo={groupInfo}
