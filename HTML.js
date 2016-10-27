@@ -15,6 +15,7 @@ class HTML extends React.Component {
   static propTypes = {
     html: React.PropTypes.string.isRequired,
     htmlStyles: React.PropTypes.object,
+    containerStyle: View.propTypes.style,
     onLinkPress: React.PropTypes.func,
     renderers: React.PropTypes.object.isRequired
   }
@@ -105,7 +106,7 @@ class HTML extends React.Component {
     parser.write(this.props.html)
     parser.done()
 
-    return (<View>{rnNodes}</View>)
+    return (<View style={this.props.containerStyle || {}}>{rnNodes}</View>)
   }
 }
 
