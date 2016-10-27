@@ -25,11 +25,12 @@ class HTML extends React.Component {
   }
 
   constructor (props) {
-      super(props);
-      this.renderers = {
-        ...HTMLRenderers,
-        ...(this.props.renderers || {})
-      };
+    super(props)
+    this.renderers = {
+      ...HTMLRenderers,
+      ...(this.props.renderers || {})
+    }
+    this.imgsToRender = [];
   }
 
   /* ****************************************************************************/
@@ -78,7 +79,8 @@ class HTML extends React.Component {
             }
           }
 
-          return (
+          let ElementsToRender
+          const Element = (
             <HTMLElement
               key={index}
               htmlStyles={this.props.htmlStyles}
@@ -91,6 +93,25 @@ class HTML extends React.Component {
               renderers={this.renderers}>
               {this.renderHtmlAsRN(node.children, node.name, !HTMLStyles.blockElements.has(node.name))}
             </HTMLElement>)
+
+          if (this.imgsToRender.length && !parentIsText) {
+            ElementsToRender = (
+              <View>
+                { this.imgsToRender.map((img, imgIndex) => <View key={`view-${index}-image-${imgIndex}`}>{ img }</View>) }
+                { Element }
+              </View>
+            )
+            this.imgsToRender = []
+          } else {
+            ElementsToRender = Element
+          }
+
+          if (node.name === 'img') {
+            this.imgsToRender.push(Element)
+            return false
+          }
+
+          return ElementsToRender
         }
       })
       .filter((e) => e !== undefined)
