@@ -7,6 +7,8 @@ import HTMLTextNode from './HTMLTextNode'
 import HTMLRenderers from './HTMLRenderers'
 import HTMLStyles from './HTMLStyles'
 
+const TEXT_NODES_NAMES = ['p']
+
 class HTML extends React.Component {
   /* ****************************************************************************/
   // Class
@@ -47,6 +49,65 @@ class HTML extends React.Component {
   /* ****************************************************************************/
 
   /**
+   * Returns an RN element from the HTML node being parsed
+   * @param node: object
+   * @param index: number
+   * @param groupInfo: object
+   * @param parentTagName: string
+   * @parentIsText: bool
+   */
+  createElement (node, index, groupInfo, parentTagName, parentIsText) {
+    return (
+      <HTMLElement
+        key={index}
+        htmlStyles={this.props.htmlStyles}
+        imagesMaxWidth={this.props.imagesMaxWidth}
+        htmlAttribs={node.attribs}
+        tagName={node.name}
+        groupInfo={groupInfo}
+        parentTagName={parentTagName}
+        parentIsText={parentIsText}
+        onLinkPress={this.props.onLinkPress}
+        renderers={this.renderers}>
+        {this.renderHtmlAsRN(node.children, node.name, !HTMLStyles.blockElements.has(node.name))}
+      </HTMLElement>
+    )
+  }
+
+  /**
+   * Returns if a text node is worth being rendered.
+   * Loop on it and look for actual text to display,
+   * if none is found, don't render it (a single img for instance)
+   */
+  shouldRenderNode (node) {
+    if (!node.children || !node.children.length) {
+      return false
+    }
+    for (let i = 0; i < node.children.length; i++) {
+      if (node.children[i].type === 'text') {
+        return true
+      }
+    }
+    return false
+  }
+
+  /**
+   * Loop on a HTML node and look for imgs that need
+   * to be rendered outside this node (ie : img outside
+   * of text elements)
+   */
+  addImgsToRenderList (node, index, groupInfo, parentTagName, parentIsText) {
+    if (!node.children || !node.children.length) {
+      return
+    }
+    for (let i = 0; i < node.children.length; i++) {
+      if (node.children[i].name === 'img') {
+        this.imgsToRender.push(this.createElement(node.children[i], index, groupInfo, parentTagName, parentIsText))
+      }
+    }
+  }
+
+  /**
   * Converts the html elements to RN elements
   * @param htmlElements: the array of html elements
   * @param parentTagName='body': the parent html element if any
@@ -81,24 +142,11 @@ class HTML extends React.Component {
           }
 
           let ElementsToRender
-          const Element = (
-            <HTMLElement
-              key={index}
-              htmlStyles={this.props.htmlStyles}
-              imagesMaxWidth={this.props.imagesMaxWidth}
-              htmlAttribs={node.attribs}
-              tagName={node.name}
-              groupInfo={groupInfo}
-              parentTagName={parentTagName}
-              parentIsText={parentIsText}
-              onLinkPress={this.props.onLinkPress}
-              renderers={this.renderers}>
-              {this.renderHtmlAsRN(node.children, node.name, !HTMLStyles.blockElements.has(node.name))}
-            </HTMLElement>)
+          const Element = this.createElement(node, index, groupInfo, parentTagName, parentIsText)
 
           if (this.imgsToRender.length && !parentIsText) {
             ElementsToRender = (
-              <View>
+              <View key={index}>
                 { this.imgsToRender.map((img, imgIndex) => <View key={`view-${index}-image-${imgIndex}`}>{ img }</View>) }
                 { Element }
               </View>
@@ -111,6 +159,14 @@ class HTML extends React.Component {
           if (node.name === 'img') {
             this.imgsToRender.push(Element)
             return false
+          }
+
+          if (TEXT_NODES_NAMES.indexOf(node.name) !== -1) {
+            this.addImgsToRenderList(node, index, groupInfo, parentTagName, parentIsText)
+
+            if (!this.shouldRenderNode(node)) {
+              return false
+            }
           }
 
           return ElementsToRender
