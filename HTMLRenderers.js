@@ -1,6 +1,7 @@
 import React from 'react'
-import { TouchableOpacity, Text, Image } from 'react-native'
+import { TouchableOpacity, Text } from 'react-native'
 import HTMLStyles from './HTMLStyles'
+import HTMLImage from './HTMLImage'
 
 module.exports = {
   /**
@@ -52,17 +53,6 @@ module.exports = {
         htmlAttribs.style ? HTMLStyles.cssStringToRNStyle(htmlAttribs.style, HTMLStyles.STYLESETS.IMAGE) : undefined
       ).filter((s) => s !== undefined)
 
-    // Extract our width & height (if any. If not render some defaults)
-    let width, height
-    for (var i = style.length - 1; i >= 0; i--) {
-      if (!width && style[i].width) { width = style[i].width }
-      if (!height && style[i].height) { height = style[i].height }
-      if (width && height) { break }
-    }
-    width = width === undefined ? 100 : width
-    height = height === undefined ? 100 : height
-
-    // Done
-    return (<Image source={{uri: htmlAttribs.src, width: width, height: height}} style={style} {...passProps} />)
+    return (<HTMLImage source={{uri: htmlAttribs.src}} style={style} {...passProps} />)
   }
 }

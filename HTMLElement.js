@@ -78,7 +78,7 @@ class HTMLElement extends React.Component {
   }
 
   render () {
-    const { htmlStyles, tagName, htmlAttribs, renderers, children, ...passProps } = this.props
+    const { htmlStyles, tagName, htmlAttribs, renderers, children, imagesMaxWidth, ...passProps } = this.props
 
     if (renderers[tagName]) {
       const copyProps = [
@@ -86,7 +86,8 @@ class HTMLElement extends React.Component {
         'groupInfo',
         'parentTagName',
         'onLinkPress',
-        'parentIsText'
+        'parentIsText',
+        'imagesMaxWidth'
       ].reduce((acc, k) => {
         acc[k] = this.props[k]
         return acc
