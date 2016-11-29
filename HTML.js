@@ -6,8 +6,7 @@ import HTMLElement from './HTMLElement'
 import HTMLTextNode from './HTMLTextNode'
 import HTMLRenderers from './HTMLRenderers'
 import HTMLStyles from './HTMLStyles'
-
-const TEXT_NODES_NAMES = ['p']
+import { TEXT_TAG_NAMES } from './HTMLUtils'
 
 class HTML extends React.Component {
   /* ****************************************************************************/
@@ -161,7 +160,7 @@ class HTML extends React.Component {
             return false
           }
 
-          if (TEXT_NODES_NAMES.indexOf(node.name) !== -1) {
+          if (TEXT_TAG_NAMES.has(node.name)) {
             this.addImgsToRenderList(node, index, groupInfo, parentTagName, parentIsText)
 
             if (!this.shouldRenderNode(node)) {
