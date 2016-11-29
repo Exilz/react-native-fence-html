@@ -32,7 +32,7 @@ class HTML extends React.Component {
       ...HTMLRenderers,
       ...(this.props.renderers || {})
     }
-    this.imgsToRender = [];
+    this.imgsToRender = []
   }
 
   /* ****************************************************************************/
@@ -75,8 +75,8 @@ class HTML extends React.Component {
 
   /**
    * Returns if a text node is worth being rendered.
-   * Loop on it and look for actual text to display,
-   * if none is found, don't render it (a single img for instance)
+   * Loop on it and its children and look for actual text to display,
+   * if none is found, don't render it (a single img or an empty p for instance)
    */
   shouldRenderNode (node) {
     if (!node.children || !node.children.length) {
@@ -85,6 +85,12 @@ class HTML extends React.Component {
     for (let i = 0; i < node.children.length; i++) {
       if (node.children[i].type === 'text') {
         return true
+      } else if (TEXT_TAG_NAMES.has(node.children[i].name)) {
+        if (this.shouldRenderNode(node.children[i])) {
+          return true
+        } else {
+          continue
+        }
       }
     }
     return false
